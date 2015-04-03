@@ -8,6 +8,7 @@
  */
 package org.openhab.binding.mochadx10.commands;
 
+import org.openhab.binding.mochadx10.internal.MochadX10BindingConfig;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.library.types.OnOffType;
 
@@ -30,8 +31,8 @@ public class MochadX10OnCommand extends MochadX10Command {
 	}
 
 	@Override
-	public void postCommand(String itemName, int currentLevel) {
-		eventPublisher.postCommand(itemName, OnOffType.ON);
+	public void postCommand(MochadX10BindingConfig bindingConfig, int currentLevel) {
+		eventPublisher.postCommand(bindingConfig.getItemName(), OnOffType.ON);
 	}
 	
 	@Override

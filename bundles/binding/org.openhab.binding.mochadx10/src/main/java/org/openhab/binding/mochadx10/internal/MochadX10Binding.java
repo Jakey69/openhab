@@ -167,10 +167,10 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
     		if (command != null) {
         		logger.debug("Command: " + command.toString());
         		
-    			String itemName = getItemNameForAddress(command.getAddress());
+    			MochadX10BindingConfig bindingConfig = getBindingConfigForAddress(command.getAddress());
     			
-    			if (itemName != null) {
-        			command.postCommand(itemName, getCurrentLevel(command.getAddress().toString()));
+    			if (bindingConfig != null) {
+        			command.postCommand(bindingConfig, getCurrentLevel(command.getAddress().toString()));
 
     				logger.debug("Address " + command.getAddress() + " level set to " + command.getLevel());
     				
@@ -336,30 +336,52 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 		return false;
 	}
 	
+//	/**
+//	 * Given an X10 address (<houseCode><unitCode>) find the name of the 
+//	 * corresponding bounded item
+//	 * 
+//	 * @param address	The X10 address
+//	 * @return			The name of the corresponding item, null if no corresponding
+//	 * 					item could be found.
+//	 */
+//	private String getItemNameForAddress(MochadX10Address address) {
+//		for (MochadX10BindingProvider provider : this.providers) {
+//			Collection<String> itemNames = provider.getItemNames();
+//			for (String itemName: itemNames) {
+//				MochadX10BindingConfig bindingConfig = provider.getItemConfig(itemName);
+//				if (bindingConfig.getAddress().equals(address.toString())) {
+//					return bindingConfig.getItemName();
+//				}
+//			}
+//		}
+//		logger.warn("No item name found for address '" + address.toString() + "'");
+//		
+//		return null;
+//	}
+//	
+//	
 	/**
-	 * Given an X10 address (<houseCode><unitCode>) find the name of the 
+	 * Given an X10 address (<houseCode><unitCode>) find the binding config of the 
 	 * corresponding bounded item
 	 * 
 	 * @param address	The X10 address
-	 * @return			The name of the corresponding item, null if no corresponding
+	 * @return			The binding config of the corresponding item, null if no corresponding
 	 * 					item could be found.
 	 */
-	private String getItemNameForAddress(MochadX10Address address) {
+	private MochadX10BindingConfig getBindingConfigForAddress(MochadX10Address address) {
 		for (MochadX10BindingProvider provider : this.providers) {
 			Collection<String> itemNames = provider.getItemNames();
 			for (String itemName: itemNames) {
 				MochadX10BindingConfig bindingConfig = provider.getItemConfig(itemName);
 				if (bindingConfig.getAddress().equals(address.toString())) {
-					return bindingConfig.getItemName();
+					return bindingConfig;
 				}
 			}
 		}
-		logger.warn("No item name found for address '" + address.toString() + "'");
+		logger.warn("No binding config found for address '" + address.toString() + "'");
 		
 		return null;
 	}
-	
-	
 	
 	/**
 	 * Lookup of the configuration of the named item.
@@ -419,7 +441,7 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 					long dim_value = 0;
 					if (deviceConfig.getDimMethod().equals("xdim")) {
 						// 100% maps to value (XDIM_LEVELS - 1) so we need to do scaling
-						dim_value = Math.round(((PercentType) command).doubleValue() * (MochadX10Command.XDIM_LEVELS - 1)/100);
+						dim_value = Math.round(((PercentType) command).doubleValue() * (deviceConfig.getNumberDimLevels() - 1)/100);
 						commandStr = "xdim " + dim_value;
 					}
 					else {
@@ -435,11 +457,11 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 						int relativeValue;
 						
 						if (newValue > currentValue) {
-							relativeValue = (int) Math.round((newValue - currentValue) * ((MochadX10Command.DIM_LEVELS - 1)*1.0/100));
+							relativeValue = (int) Math.round((newValue - currentValue) * ((deviceConfig.getNumberDimLevels() - 1)*1.0/100));
 							commandStr = "bright " + relativeValue;
 						}
 						else if (currentValue > newValue) {
-							relativeValue = (int) Math.round((currentValue - newValue) * ((MochadX10Command.DIM_LEVELS - 1)*1.0/100));
+							relativeValue = (int) Math.round((currentValue - newValue) * ((deviceConfig.getNumberDimLevels() - 1)*1.0/100));
 							commandStr = "dim " + relativeValue;
 						}
 						else {
