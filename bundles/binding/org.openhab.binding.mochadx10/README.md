@@ -37,7 +37,8 @@ Addressing of X10 devices is done using a so called house code and a unit code. 
 
 X10 devices can be controlled by sending commands over the power-line or by sending RF commands. To explicitly specify the `transmitMethod` a value of `pl` for power-line or `rf` for radio frequency can be used. If `transmitMethod` is not specified it defaults to `pl`.
 
-X10 dimmer devices can use one the `dim/bright` commands or the `xdim` command to set the level of lighting. To explicitly specify the `dimMethod` of an X10 device, set it to `dim` for using the 'dim/bright' commands, or to `xdim` for using the `xdim` command. If `dimMethod` is not specified it defaults to `xdim`
+X10 dimmer devices can use one the `dim/bright` commands or the `xdim` command to set the level of lighting. To explicitly specify the `dimMethod` of an X10 device, set it to `dim` for using the 'dim/bright' commands, or to `xdim` for using the `xdim` command. If `dimMethod` is not specified it defaults to `xdim`. Furthermore, it is also possible to specify the maximum number of dim levels to be used by the item. This is done by appending the `dimMethod` with ",<maximum number of dim levels>" (withouth the double quotes).
+
 
 ## Examples
 
@@ -45,5 +46,6 @@ Here are some examples of valid binding configuration strings, as defined in the
 
     Dimmer Light_Corridor_Dimmer "Hallway Dimmer [%d %%]" (GF_Corridor) {mochadx10="a1"}
     Dimmer Light_Living_Dimmer "Living Dimmer [%d %%]" (GF_Living) {mochadx10="a2:pl:dim"}
+    Dimmer Light_Dining_Dimmer "Dining Dimmer [%d %%]" (GF_Dining) {mochadx10="a2:pl:dim,32"}
     Switch Mech_Vent "Mechanical ventilation" (GF_Kitchen) {mochadx10="b12"}
     Rollershutter "Bedroom" (FF_Bedroom) {mochadx10="m3:rf"}
