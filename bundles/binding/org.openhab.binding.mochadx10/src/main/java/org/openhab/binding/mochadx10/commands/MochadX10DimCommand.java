@@ -8,8 +8,11 @@
  */
 package org.openhab.binding.mochadx10.commands;
 
+import org.openhab.binding.mochadx10.internal.MochadX10BindingConfig;
 import org.openhab.core.events.EventPublisher;
 import org.openhab.core.library.types.PercentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the X10 Dim command
@@ -19,6 +22,8 @@ import org.openhab.core.library.types.PercentType;
  *
  */
 public class MochadX10DimCommand extends MochadX10Command {
+	static final Logger logger = LoggerFactory.getLogger(MochadX10DimCommand.class);
+	
 	/**
 	 * The dim value received from the Mochad X10 server. 
 	 * Note this is a relative value in the range [0..DIM_LEVELS)
@@ -39,13 +44,15 @@ public class MochadX10DimCommand extends MochadX10Command {
 	}
 
 	@Override
-	public void postCommand(String itemName, int currentLevel) {
+	public void postCommand(MochadX10BindingConfig bindingConfig, int currentLevel) {
 		if (value < 0) {
 			value = 1;
 		}
-		level = Math.max(0, currentLevel - value * 100/(MochadX10Command.DIM_LEVELS - 1));
+		level = Math.max(0, currentLevel - value * 100/(bindingConfig.getNumberDimLevels() - 1));
 		
-		eventPublisher.postCommand(itemName, new PercentType(level));
+		eventPublisher.postCommand(bindingConfig.getItemName(), new PercentType(level));
+		
+		logger.debug("number dim levels used: " + bindingConfig.getNumberDimLevels());
 	}
 
 	@Override

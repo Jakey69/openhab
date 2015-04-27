@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.openhab.binding.mochadx10.MochadX10BindingProvider;
 import org.openhab.binding.mochadx10.commands.MochadX10Address;
+import org.openhab.binding.mochadx10.commands.MochadX10Command;
 import org.openhab.core.binding.BindingConfig;
 import org.openhab.core.items.Item;
 import org.openhab.core.library.items.DimmerItem;
@@ -46,6 +47,11 @@ public class MochadX10GenericBindingProvider extends AbstractGenericBindingProvi
 
 	static final Logger logger = LoggerFactory.getLogger(MochadX10GenericBindingProvider.class);
 
+	/**
+	 * The regular expression that specifies the dim properties
+	 */
+	public static final Pattern DIM_PATTERN = Pattern.compile("(?<method>(dim)|(xdim))(,(?<levels>[0-9]*))?");
+	
 	@Override
 	public String getBindingType() {
 		return "mochadx10";
@@ -78,12 +84,16 @@ public class MochadX10GenericBindingProvider extends AbstractGenericBindingProvi
 			String address 		  = getAddress(bindingConfigLc);
 			String transmitMethod = getTransmitMethod(bindingConfigLc);
 			String dimMethod      = getDimMethod(bindingConfigLc);
+			int numberDimLevels   = getNumberDimLevels(bindingConfigLc);
 			
 			if (address != null) {
 				if (transmitMethod == null) transmitMethod = "pl";
-				if (dimMethod == null) dimMethod = "xdim";
+				if (dimMethod == null) {
+					dimMethod = "xdim";
+					numberDimLevels = MochadX10Command.DEFAULT_XDIM_LEVELS;
+				}
 
-				BindingConfig mochadX10BindingConfig = (BindingConfig) new MochadX10BindingConfig(item.getName(), item.getClass(), transmitMethod, dimMethod, address);
+				BindingConfig mochadX10BindingConfig = (BindingConfig) new MochadX10BindingConfig(item.getName(), item.getClass(), transmitMethod, dimMethod, numberDimLevels, address);
 
 				addBindingConfig(item, mochadX10BindingConfig);
 			}
@@ -162,14 +172,35 @@ public class MochadX10GenericBindingProvider extends AbstractGenericBindingProvi
 	private String getDimMethod(String msg) {
 		String[] strings = msg.split(":");
 		
-		Pattern dimPattern = Pattern.compile("(dim)|(xdim)");
+//		Pattern dimPattern = Pattern.compile("(?<dimMethod>(dim)|(xdim))(,(?<numberLevels>[0-9]*))");
 		for (String s: strings) {
-			Matcher matcher = dimPattern.matcher(s);
+			Matcher matcher = DIM_PATTERN.matcher(s);
 			if (matcher.matches()) {
-				return s;
+				return matcher.group("method");
 			}
 		}
 		
 		return null;
+	}
+	
+	private int getNumberDimLevels(String msg) {
+		String[] strings = msg.split(":");
+		
+		for (String s: strings) {
+			Matcher matcher = DIM_PATTERN.matcher(s);
+			if (matcher.matches()) {
+				String method = matcher.group("method");
+				String levels = matcher.group("levels");
+				
+				if (method.equals("dim")) {
+					return levels == null ? MochadX10Command.DEFAULT_DIM_LEVELS : Integer.parseInt(matcher.group("levels"));
+				}
+				else {
+					return levels == null ? MochadX10Command.DEFAULT_XDIM_LEVELS : Integer.parseInt(matcher.group("levels"));
+				}
+			}
+		}
+		
+		return -1;
 	}
 }

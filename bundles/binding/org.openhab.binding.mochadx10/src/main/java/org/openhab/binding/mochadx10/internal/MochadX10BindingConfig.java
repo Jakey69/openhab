@@ -59,6 +59,11 @@ public class MochadX10BindingConfig implements BindingConfig {
 	 * Value 'xdim': use xdim command
 	 */
 	private String dimMethod;
+	
+	/**
+	 * The number of dim levels to use
+	 */
+	private int numberDimLevels;
 
 	/**
 	 * The type of the item
@@ -77,14 +82,23 @@ public class MochadX10BindingConfig implements BindingConfig {
 	 * @param itemType			The type of the item			
 	 * @param transmitMethod	The optional transmission method for the X10 command.
 	 * @param dimMethod			The optional dim method 
+	 * @param numberDimLevels	The optional number of dim levels
 	 * @param address 			The address of the X10 module
 	 */
-	public MochadX10BindingConfig(String itemName, Class<? extends Item> itemType, String transmitMethod, String dimMethod, String address) {
+	public MochadX10BindingConfig(String itemName, Class<? extends Item> itemType, String transmitMethod, String dimMethod, int numberDimLevels, String address) {
 		this.itemName = itemName;
 		this.itemType = itemType;
 		this.address = address.toLowerCase();
 		this.transmitMethod = transmitMethod.toLowerCase();
 		this.dimMethod = dimMethod;
+		this.numberDimLevels = numberDimLevels;
+	}
+
+	/**
+	 * @return the number of dim levels specified in the binding config
+	 */
+	public int getNumberDimLevels() {
+		return numberDimLevels;
 	}
 
 	/**

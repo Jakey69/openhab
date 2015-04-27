@@ -8,6 +8,7 @@
  */
 package org.openhab.binding.mochadx10.commands;
 
+import org.openhab.binding.mochadx10.internal.MochadX10BindingConfig;
 import org.openhab.core.events.EventPublisher;
 
 /**
@@ -23,12 +24,12 @@ public class MochadX10Command {
 	/**
 	 * Number of levels used by the 'dim' command
 	 */
-	public static final int DIM_LEVELS  = 22;
+	public static final int DEFAULT_DIM_LEVELS  = 22;
 	
 	/**
 	 * Number of levels used by the 'xdim' command
 	 */
-	public static final int XDIM_LEVELS = 64;
+	public static final int DEFAULT_XDIM_LEVELS = 64;
 		
 	/**
 	 * The eventPublisher required to postCommand
@@ -92,10 +93,10 @@ public class MochadX10Command {
 	 * The currentState is required because some commands upate the state in a 
 	 * relative fashion.
 	 * 
-	 * @param itemName		The itemName to post the command to
+	 * @param bindingConfig		The itemName to post the command to
 	 * @param currentState	The currentState of the item
 	 */
-	public void postCommand(String itemName, int level) {
+	public void postCommand(MochadX10BindingConfig bindingConfig, int level) {
 		// To be implemented by specific command classes
 	}
 
