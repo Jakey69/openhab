@@ -215,13 +215,15 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 	public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
 		if ( properties != null ) {
 			String ip = (String) properties.get( "hostIp" );
-			if ( StringUtils.isNotBlank( ip ) ) {
-				if ( isValidIpAddress( ip ) ) {
-					this.hostIp = ip;
-				}
-				else {
-					throw new ConfigurationException(hostIp, "The specified hostIp address \"" + ip + "\" is not a valid ip address");
-				}
+			
+			InetAddress address;
+			try {
+				address = InetAddress.getByName(ip);
+				this.hostIp = address.getHostAddress();
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw new ConfigurationException(hostIp, "The specified hostIp address \"" + ip + "\" is not a valid ip address or hostname");
 			}
 			
 			String port = (String) properties.get("hostPort");
