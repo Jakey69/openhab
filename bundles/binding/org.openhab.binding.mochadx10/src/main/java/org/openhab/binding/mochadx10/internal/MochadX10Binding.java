@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.net.InetAddress;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.mochadx10.MochadX10BindingProvider;
