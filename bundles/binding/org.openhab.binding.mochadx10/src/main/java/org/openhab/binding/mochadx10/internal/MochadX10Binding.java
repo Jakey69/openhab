@@ -490,7 +490,12 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 		}
 		else if ( command instanceof IncreaseDecreaseType ) {
 			// Increase decrease not yet supported
-			commandStr = "none";
+			commandStr = IncreaseDecreaseType.DECREASE.equals( command ) ? "dim" : "bright";
+			Integer currentValue = currentLevel.get(address);
+			if (currentValue == null) {
+				currentValue = 0;
+			}
+			level = IncreaseDecreaseType.DECREASE.equals( command ) ? currentValue - 5 : currentValue + 5;
 		}
 
 		try {
