@@ -500,7 +500,6 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 
 		try {
 			if ( !commandStr.equals( "none" ) ) {
-				logger.debug("SendTimes: " + sendTimes);
 				for(int i=1; i<=sendTimes; i++) {
 					out.writeBytes(tm + " " + address + " " + commandStr + "\n");
 					logger.debug(tm + " " + address + " " + commandStr);
