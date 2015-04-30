@@ -495,10 +495,19 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 
 		try {
 			if ( !commandStr.equals( "none" ) ) {
-				out.writeBytes(tm + " " + address + " " + commandStr + "\n");
-				logger.debug(tm + " " + address + " " + commandStr);
-				out.flush();
-				
+				logger.debug("SendTimes: " + sendTimes);
+				for(int i=1; i<=sendTimes; i++) {
+					out.writeBytes(tm + " " + address + " " + commandStr + "\n");
+					logger.debug(tm + " " + address + " " + commandStr);
+					out.flush();
+					try {
+						Thread.sleep(350);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						logger.error("InterruptedException: " + e.getMessage() + " Interrupted the sleep delay" );
+					}
+				}
+
 				previousX10Address.setAddress(address);
 				logger.debug("Previous X10 address set to " + previousX10Address.toString());
 
