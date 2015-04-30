@@ -436,6 +436,10 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 		}
 		else if ( command instanceof PercentType ) {
 			if ( deviceConfig.getItemType() == DimmerItem.class ) {
+				Integer currentValue = currentLevel.get(address);
+				if (currentValue == null) {
+					currentValue = 0;
+				}
 				level = ((PercentType) command).intValue();
 				if ( ((PercentType) command).intValue() == 0 ) {
 					// If percent value equals 0 the x10 "off" command is used instead of the dim command
@@ -450,10 +454,6 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 					}
 					else {
 						// 100% maps to value (DIM_LEVELS - 1) so we need to do scaling
-						Integer currentValue = currentLevel.get(address);
-						if (currentValue == null) {
-							currentValue = 0;
-						}
 
 	    				logger.debug("Address " + address + " current level " + currentValue);
 
