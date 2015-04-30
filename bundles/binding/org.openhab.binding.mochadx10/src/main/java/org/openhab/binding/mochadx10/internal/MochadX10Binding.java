@@ -415,6 +415,7 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 		String commandStr = "none";
 		Command previousCommand = lastIssuedCommand.get( address );
 		int level = -1;
+		int sendTimes = 1;
 		
 		if ( command instanceof OnOffType ) {
 			commandStr = OnOffType.ON.equals( command ) ? "on" : "off";
