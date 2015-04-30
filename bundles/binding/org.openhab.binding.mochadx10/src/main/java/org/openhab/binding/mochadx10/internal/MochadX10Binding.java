@@ -441,6 +441,12 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 					currentValue = 0;
 				}
 				level = ((PercentType) command).intValue();
+				
+				if ( deviceConfig.getTransmitMethod().equals("rf") ) {
+					sendTimes = Math.abs((currentValue - level) / 5);
+					level = Math.abs(currentValue - (5*sendTimes));
+				}
+								
 				if ( ((PercentType) command).intValue() == 0 ) {
 					// If percent value equals 0 the x10 "off" command is used instead of the dim command
 					commandStr = "off";
