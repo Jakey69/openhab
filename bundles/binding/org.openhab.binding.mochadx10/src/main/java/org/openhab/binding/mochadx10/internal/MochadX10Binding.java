@@ -443,8 +443,9 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 				level = ((PercentType) command).intValue();
 				
 				if ( deviceConfig.getTransmitMethod().equals("rf") ) {
-					sendTimes = Math.abs((currentValue - level) / 5);
-					level = Math.abs(currentValue - (5*sendTimes));
+					sendTimes = Math.abs((currentValue - level) / (100 / (deviceConfig.getNumberDimLevels() - 1)));
+					int Direction =  (int) Math.signum(level - currentValue);
+					level = Math.abs(currentValue + Direction * (100 / (deviceConfig.getNumberDimLevels() - 1) * sendTimes));
 				}
 								
 				if ( ((PercentType) command).intValue() == 0 ) {
