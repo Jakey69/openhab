@@ -496,7 +496,7 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 			if (currentValue == null) {
 				currentValue = 0;
 			}
-			level = IncreaseDecreaseType.DECREASE.equals( command ) ? currentValue - 5 : currentValue + 5;
+			level = IncreaseDecreaseType.DECREASE.equals( command ) ? currentValue - 100 / (deviceConfig.getNumberDimLevels() - 1) : currentValue + 100 / (deviceConfig.getNumberDimLevels() - 1);
 		}
 
 		try {
