@@ -415,6 +415,7 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 		String commandStr = "none";
 		Command previousCommand = lastIssuedCommand.get( address );
 		int level = -1;
+		int sendTimes = 1;
 		
 		if ( command instanceof OnOffType ) {
 			commandStr = OnOffType.ON.equals( command ) ? "on" : "off";
@@ -435,7 +436,18 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 		}
 		else if ( command instanceof PercentType ) {
 			if ( deviceConfig.getItemType() == DimmerItem.class ) {
+				Integer currentValue = currentLevel.get(address);
+				if (currentValue == null) {
+					currentValue = 0;
+				}
 				level = ((PercentType) command).intValue();
+				
+				if ( deviceConfig.getTransmitMethod().equals("rf") ) {
+					sendTimes = Math.abs((currentValue - level) / (100 / (deviceConfig.getNumberDimLevels() - 1)));
+					int Direction =  (int) Math.signum(level - currentValue);
+					level = Math.abs(currentValue + Direction * (100 / (deviceConfig.getNumberDimLevels() - 1) * sendTimes));
+				}
+								
 				if ( ((PercentType) command).intValue() == 0 ) {
 					// If percent value equals 0 the x10 "off" command is used instead of the dim command
 					commandStr = "off";
@@ -449,10 +461,6 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 					}
 					else {
 						// 100% maps to value (DIM_LEVELS - 1) so we need to do scaling
-						Integer currentValue = currentLevel.get(address);
-						if (currentValue == null) {
-							currentValue = 0;
-						}
 
 	    				logger.debug("Address " + address + " current level " + currentValue);
 
@@ -483,15 +491,28 @@ public class MochadX10Binding extends AbstractBinding<MochadX10BindingProvider> 
 		}
 		else if ( command instanceof IncreaseDecreaseType ) {
 			// Increase decrease not yet supported
-			commandStr = "none";
+			commandStr = IncreaseDecreaseType.DECREASE.equals( command ) ? "dim" : "bright";
+			Integer currentValue = currentLevel.get(address);
+			if (currentValue == null) {
+				currentValue = 0;
+			}
+			level = IncreaseDecreaseType.DECREASE.equals( command ) ? currentValue - 100 / (deviceConfig.getNumberDimLevels() - 1) : currentValue + 100 / (deviceConfig.getNumberDimLevels() - 1);
 		}
 
 		try {
 			if ( !commandStr.equals( "none" ) ) {
-				out.writeBytes(tm + " " + address + " " + commandStr + "\n");
-				logger.debug(tm + " " + address + " " + commandStr);
-				out.flush();
-				
+				for(int i=1; i<=sendTimes; i++) {
+					out.writeBytes(tm + " " + address + " " + commandStr + "\n");
+					logger.debug(tm + " " + address + " " + commandStr);
+					out.flush();
+					try {
+						Thread.sleep(350);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						logger.error("InterruptedException: " + e.getMessage() + " Interrupted the sleep delay" );
+					}
+				}
+
 				previousX10Address.setAddress(address);
 				logger.debug("Previous X10 address set to " + previousX10Address.toString());
 
